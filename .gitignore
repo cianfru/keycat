@@ -1,0 +1,6 @@
+node_modules/
+data/transfers.csv
+data/rpc_rows.csv
+data/rpc_done.txt
+data/*.log
+data/part_*

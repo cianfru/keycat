@@ -1,0 +1,293 @@
+<title>KEYCAT Holder Health</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#f5f6f4; --panel:#ffffff; --ink:#1b2026; --dim:#4f5963; --faint:#8a939c; --line:#dde1dd;
+  --accent:#0d6b6b; --buy:#25884a; --sell:#c23b2a; --warn:#b7791f;
+  --a0:#e76f51; --a1:#f4a261; --a2:#e9c46a; --a3:#6aa9a3; --a4:#1f5f6b;
+  --key:#eceee9; --keyedge:#c9cec8;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#12161a; --panel:#1a1f24; --ink:#eef1f3; --dim:#b3bcc4; --faint:#7d8791; --line:#2c343b;
+  --accent:#4fb3b0; --buy:#4cc47a; --sell:#f06a57; --warn:#e2a33f;
+  --a0:#ef8266; --a1:#f5b27a; --a2:#ecd083; --a3:#7fbdb6; --a4:#4f95a3;
+  --key:#232a30; --keyedge:#3a434b; color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --bg:#12161a; --panel:#1a1f24; --ink:#eef1f3; --dim:#b3bcc4; --faint:#7d8791; --line:#2c343b;
+  --accent:#4fb3b0; --buy:#4cc47a; --sell:#f06a57; --warn:#e2a33f;
+  --a0:#ef8266; --a1:#f5b27a; --a2:#ecd083; --a3:#7fbdb6; --a4:#4f95a3;
+  --key:#232a30; --keyedge:#3a434b; color-scheme:dark; }
+body{background:var(--bg);color:var(--ink);font:16px/1.6 "IBM Plex Sans",system-ui,sans-serif;margin:0}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:20px;padding-block:40px 64px;display:flex;flex-direction:column;gap:44px}
+h1,h2,h3{font-family:Archivo,"Helvetica Neue",Arial,sans-serif;text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(30px,5vw,46px);font-weight:800;letter-spacing:-.01em}
+h2{font-size:24px;font-weight:700}
+h3{font-size:16px;font-weight:700}
+.eyebrow{font:500 12px/1 "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.mono,.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+p{margin:0;max-width:68ch;color:var(--ink)}
+.lede{font-size:18px;color:var(--dim)}
+header{display:flex;flex-direction:column;gap:14px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 18px;color:var(--dim);font-size:14px}
+.meta a{color:var(--accent)}
+/* keycap chips: the one keyboard nod */
+.key{display:inline-block;font:500 12px/1 "IBM Plex Mono",monospace;letter-spacing:.04em;padding:6px 8px 5px;border-radius:5px;background:var(--key);border:1px solid var(--keyedge);border-bottom-width:3px;color:var(--ink);text-transform:uppercase;white-space:nowrap}
+.key.bad{color:var(--sell)} .key.good{color:var(--buy)} .key.mid{color:var(--warn)}
+.verdict{display:flex;flex-direction:column;gap:14px;padding:22px;background:var(--panel);border:1px solid var(--line);border-radius:10px}
+.verdict ul{margin:0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:12px}
+.verdict li{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:baseline}
+.verdict li .key{min-width:84px;text-align:center}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.stat{background:var(--panel);padding:16px 18px;display:flex;flex-direction:column;gap:6px}
+.stat .v{font:500 26px/1.1 "IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+.stat .l{font-size:13px;color:var(--dim);line-height:1.35}
+section{display:flex;flex-direction:column;gap:16px}
+.row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+figure{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 16px 10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+figcaption{font-size:13px;color:var(--dim);line-height:1.45}
+.cv{position:relative;height:300px;width:100%}
+.cv.tall{height:340px}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font:500 12px/1.2 "IBM Plex Mono",monospace;letter-spacing:.04em;text-transform:uppercase;color:var(--dim);background:var(--bg)}
+td:first-child,th:first-child{text-align:left}
+td{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+td a{color:var(--accent);text-decoration:none} td a:hover{text-decoration:underline}
+.pos{color:var(--buy)} .neg{color:var(--sell)}
+.method{font-size:14px;color:var(--dim);display:flex;flex-direction:column;gap:10px}
+.method p{color:var(--dim);max-width:80ch}
+.method b{color:var(--ink)}
+@media (max-width:520px){ .wrap{padding-inline:16px} .cv{height:250px} .cv.tall{height:290px} .verdict li{grid-template-columns:1fr} }
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Base · on-chain holder report · data to <span id="asof"></span></div>
+  <h1>KEYCAT holder health check</h1>
+  <p class="lede" id="lede"></p>
+  <div class="meta">
+    <span>Contract <a class="mono" href="https://basescan.org/token/0x9a26f5433671751c3276a065f57e5a02d2817973" target="_blank" rel="noopener">0x9a26…7973</a></span>
+    <span id="metaTx"></span>
+  </div>
+</header>
+
+<div class="verdict" aria-labelledby="vh">
+  <h2 id="vh">What the chain says</h2>
+  <ul id="verdict"></ul>
+</div>
+
+<div class="stats" id="stats"></div>
+
+<section>
+  <div class="eyebrow">01 · Underwater</div>
+  <h2>How many holders are underwater</h2>
+  <p>Every coin still held is traced to the price it was received at (first in, first out). A holder is underwater when the remaining coins cost more, on average, than KEYCAT trades for today.</p>
+  <div class="row2">
+    <figure><div class="cv"><canvas id="cSip" aria-label="Supply in profit and price over time"></canvas></div>
+      <figcaption>Share of held supply bought below the price of that week (line) against the price (area, log scale).</figcaption></figure>
+    <figure><div class="cv"><canvas id="cDepth" aria-label="How deep holders are underwater"></canvas></div>
+      <figcaption id="depthCap"></figcaption></figure>
+  </div>
+  <figure><div class="cv"><canvas id="cRp" aria-label="Price against realized price"></canvas></div>
+    <figcaption>Price against the realized price, the average cost of every coin still held. Price under the line means the average holder is in a loss.</figcaption></figure>
+</section>
+
+<section>
+  <div class="eyebrow">02 · Buying pressure</div>
+  <h2>Who is buying and who is selling on the DEX pools</h2>
+  <p>Coins leaving a KEYCAT pool or aggregator to a wallet are buys; coins sent into one are sells. Arbitrage bots buy on one pool and sell on another, so each wallet's trades are netted over the week first. A wallet counts as a buyer or seller only if its weekly net is at least $5.</p>
+  <figure><div class="cv tall"><canvas id="cFlow" aria-label="Weekly net buying and net selling in USD"></canvas></div>
+    <figcaption>Weekly dollars from wallets that were net buyers (up) and net sellers (down), with the difference as a line. Last 52 weeks.</figcaption></figure>
+  <figure><div class="cv"><canvas id="cPeople" aria-label="Weekly buyers and sellers"></canvas></div>
+    <figcaption>Wallets that were net buyers and net sellers each week, last 52 weeks.</figcaption></figure>
+</section>
+
+<section>
+  <div class="eyebrow">03 · Exits</div>
+  <h2>Are people leaving</h2>
+  <div class="row2">
+    <figure><div class="cv"><canvas id="cHolders" aria-label="Holders by size over time"></canvas></div>
+      <figcaption id="holdersCap"></figcaption></figure>
+    <figure><div class="cv"><canvas id="cBig" aria-label="Wallets joining and leaving the 1M KEYCAT group"></canvas></div>
+      <figcaption>Week over week: wallets that joined the 1M+ group (up) and wallets that left it (down).</figcaption></figure>
+  </div>
+  <div class="row2">
+    <figure><div class="cv"><canvas id="cReal" aria-label="Realized profit and loss of DEX sellers"></canvas></div>
+      <figcaption>Profit and loss realized by wallets selling into the pools each week, against what those coins cost them.</figcaption></figure>
+    <figure><div class="cv"><canvas id="cAge" aria-label="Held supply by holding age"></canvas></div>
+      <figcaption>Held supply by how long it has sat in the same wallet. A growing dark band means old holders are staying put.</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">04 · Big holders</div>
+  <h2>What the biggest wallets are doing</h2>
+  <p id="cohortP"></p>
+  <div class="tbl"><table id="cohortT"></table></div>
+  <div class="tbl"><table id="topT"></table></div>
+</section>
+
+<section class="method">
+  <div class="eyebrow">Method</div>
+  <h2>How these numbers were made</h2>
+  <p><b>Data.</b> Every KEYCAT Transfer event on Base since launch (<span id="mN"></span> transfers), read from public Base RPC nodes and sorted by block and log index, so ordering is exact. Daily price is the Uniswap V2 KEYCAT/WETH pool's reserves at 12:00 UTC times Coinbase's ETH/USD close. It matches GeckoTerminal's daily closes to a median 0.3% over the last year.</p>
+  <p><b>Cost basis.</b> Each wallet keeps its coins as lots in the order received, and a send uses up the oldest lots first. A coin received from anyone, including airdrops and transfers from another wallet, carries that day's market price. That is the standard realized-price convention, so a holder who moved coins between their own wallets looks like a fresh buyer.</p>
+  <p><b>Excluded.</b> Pools (Uniswap V2/V3/V4, Aerodrome), the null address and the burn address are not holders. No exchange wallet is labelled for KEYCAT on Base explorers, so infrastructure is found by behaviour. Counting only transfers of at least 1,000 KEYCAT, a wallet that sent 300 or more and received 100 or more, to at least 100 and from at least 25 different wallets, is market infrastructure. <span id="mInfra"></span></p>
+  <div class="tbl"><table id="exT"></table></div>
+  <p><b>Wallets, not people.</b> One person can own many wallets. About 870,000 addresses hold less than 1 KEYCAT, mostly spam dust, so a holder here means at least 1 KEYCAT. The size tiers (10k, 100k, 1M) show where the real money is. Balances were checked against live on-chain <span class="mono">balanceOf</span> for the largest wallets and match to the wei.</p>
+  <p><b>Reproduce.</b> <span class="mono">python3 scripts/pull_transfers_rpc.py</span>, <span class="mono">python3 scripts/pull_price_onchain.py</span>, <span class="mono">node scripts/analyze.mjs</span> in the keycat repository.</p>
+</section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const R = /*DATA*/null;
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fmt = (v, d = 0) => v.toLocaleString("en-US", { maximumFractionDigits: d, minimumFractionDigits: d });
+const usd = v => { const a = Math.abs(v); const s = v < 0 ? "−$" : "$"; return a >= 1e6 ? s + fmt(a / 1e6, 2) + "M" : a >= 1e3 ? s + fmt(a / 1e3, 1) + "k" : s + fmt(a, 0); };
+const tok = v => { const a = Math.abs(v), s = v < 0 ? "−" : ""; return a >= 1e9 ? s + fmt(a / 1e9, 2) + "B" : a >= 1e6 ? s + fmt(a / 1e6, 1) + "M" : a >= 1e3 ? s + fmt(a / 1e3, 0) + "k" : s + fmt(a, 0); };
+const price = p => "$" + (p >= 0.01 ? p.toFixed(4) : p.toPrecision(3));
+const short = a => a.slice(0, 6) + "…" + a.slice(-4);
+
+const S = R.snaps, cur = S.at(-1), W = R.weekly;
+const ath = R.prices.reduce((m, r) => (r[1] > m[1] ? r : m));
+const dd = 100 * (1 - cur.price / ath[1]);
+const last = (arr, n) => arr.slice(-n);
+const sum = (arr, k) => arr.reduce((s, x) => s + x[k], 0);
+const w12 = last(W, 12), w52 = last(W, 52);
+const buy12 = sum(w12, "netBuyUsd"), sell12 = sum(w12, "netSellUsd"), net12 = buy12 - sell12;
+const buy52 = sum(w52, "netBuyUsd"), sell52 = sum(w52, "netSellUsd");
+const B = R.holderBars, bi = v => B.indexOf(v);
+const peakOf = i => S.reduce((m, r) => (r.byBar[i] > m.byBar[i] ? r : m));
+const i100k = bi(1e5), i1m = bi(1e6), i10k = bi(1e4);
+const p100k = peakOf(i100k), p1m = peakOf(i1m), p10k = peakOf(i10k);
+const drop = (now, peak) => 100 * (1 - now / peak);
+const c90 = R.cohort["90"], c30 = R.cohort["30"];
+
+document.getElementById("asof").textContent = R.updated;
+document.getElementById("metaTx").textContent = fmt(R.transfers) + " transfers · " + fmt(R.walletsEver) + " wallets ever";
+document.getElementById("mN").textContent = fmt(R.transfers);
+document.getElementById("lede").textContent =
+  `KEYCAT trades at ${price(cur.price)}, ${fmt(dd, 0)}% under its ${ath[0]} high of ${price(ath[1])}. ` +
+  `This report rebuilds every wallet's position from the full transfer history to see who is underwater, who is buying and who is leaving.`;
+
+// verdict lines — each chip is derived from the number, never hand-set
+const V = [];
+const chip = (cls, txt) => `<span class="key ${cls}">${txt}</span>`;
+const u100k = cur.underBar[i100k];
+V.push([u100k >= 70 ? chip("bad", "underwater") : u100k >= 45 ? chip("mid", "mixed") : chip("good", "in profit"),
+  `<b>${fmt(u100k, 0)}%</b> of wallets holding 100k+ KEYCAT and <b>${fmt(cur.underBar[i1m], 0)}%</b> of wallets holding 1M+ are in a loss on the coins they still hold. The average held coin cost <b>${price(cur.rp)}</b>, ${fmt(cur.rp / cur.price, 1)}× today's price.`]);
+const flat = Math.abs(net12) < 0.05 * (buy12 + sell12);
+V.push([flat ? chip("mid", "balanced") : net12 > 0 ? chip("good", "net buying") : chip("bad", "net selling"),
+  `Over the last 12 weeks net buyers put in <b>${usd(buy12)}</b> and net sellers took out <b>${usd(sell12)}</b>, a difference of <b>${usd(net12)}</b>. Over 52 weeks: ${usd(buy52)} in, ${usd(sell52)} out. About ${fmt(sum(w12, "netBuyers") / 12, 0)} buyers and ${fmt(sum(w12, "netSellers") / 12, 0)} sellers a week.`]);
+V.push([chip("bad", "thinning"),
+  `Wallets with 100k+ KEYCAT fell from <b>${fmt(p100k.byBar[i100k])}</b> (${p100k.d}) to <b>${fmt(cur.byBar[i100k])}</b>, down ${fmt(drop(cur.byBar[i100k], p100k.byBar[i100k]), 0)}%. Wallets with 1M+ fell from ${fmt(p1m.byBar[i1m])} to ${fmt(cur.byBar[i1m])} (−${fmt(drop(cur.byBar[i1m], p1m.byBar[i1m]), 0)}%). The count of wallets with at least 1 KEYCAT keeps rising, but that growth is in balances worth under a few dollars.`]);
+const lossShare12 = (() => { const t = sum(w12, "rProfit") + sum(w12, "rLoss"); return t ? 100 * sum(w12, "rLoss") / t : 0; })();
+V.push([lossShare12 >= 60 ? chip("bad", "capitulation") : lossShare12 >= 40 ? chip("mid", "mixed exits") : chip("good", "profit taking"),
+  `Of the P&L realized by DEX sellers in the last 12 weeks, <b>${fmt(lossShare12, 0)}%</b> was loss. Sellers booked ${usd(sum(w12, "rProfit"))} of profit and ${usd(sum(w12, "rLoss"))} of losses.`]);
+// Wallets that got ≥90% of their coins from exchange-like wallets may be exchange storage, not investors.
+const exFed = R.top50.filter(t => t.fromEx >= 90);
+const exNet = d => exFed.reduce((a, t) => a + t["d" + d], 0);
+const n90x = c90.net - exNet(90), n30x = c30.net - exNet(30);
+V.push([n90x < 0 && n30x < 0 ? chip("bad", "whales selling") : n90x > 0 && n30x > 0 ? chip("good", "whales adding") : chip("mid", "mixed"),
+  `Wallets with 1M+ KEYCAT changed by <b>${tok(c90.net)}</b> over 90 days and <b>${tok(c30.net)}</b> over 30 days. ${exFed.length} of the largest wallets got almost all their coins from exchange-like wallets; without them the change is <b>${tok(n90x)}</b> and <b>${tok(n30x)}</b>. ${c90.gone} of the wallets that held 1M+ 90 days ago are now empty.`]);
+document.getElementById("verdict").innerHTML = V.map(([k, t]) => `<li>${k}<span>${t}</span></li>`).join("");
+
+const stats = [
+  [price(cur.price), `price · ${fmt(dd, 0)}% below the high`],
+  [price(cur.rp), "realized price · average cost of held coins"],
+  [fmt(cur.mvrv, 2) + "×", "MVRV · price ÷ realized price"],
+  [fmt(cur.underBar[i100k], 0) + "%", "of 100k+ wallets underwater"],
+  [fmt(cur.byBar[i100k]), `wallets with 100k+ · ${fmt(cur.byBar[i1m])} with 1M+`],
+  [fmt(cur.top100, 0) + "%", "of held supply in the top 100 wallets"],
+];
+document.getElementById("stats").innerHTML = stats.map(([v, l]) => `<div class="stat"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+
+// ── charts ──
+Chart.defaults.font.family = '"IBM Plex Sans", system-ui, sans-serif';
+Chart.defaults.font.size = 12;
+Chart.defaults.color = css("--dim");
+Chart.defaults.borderColor = css("--line");
+Chart.defaults.maintainAspectRatio = false;
+Chart.defaults.plugins.legend.labels.boxWidth = 12;
+Chart.defaults.plugins.tooltip.mode = "index";
+Chart.defaults.plugins.tooltip.intersect = false;
+Chart.defaults.elements.point.radius = 0;
+Chart.defaults.animation = matchMedia("(prefers-reduced-motion: reduce)").matches ? false : { duration: 500 };
+const alpha = (c, a) => c.startsWith("#") ? c + Math.round(a * 255).toString(16).padStart(2, "0") : c;
+const lbl = S.map(r => r.d);
+const xTime = { ticks: { maxTicksLimit: 5, maxRotation: 0, autoSkipPadding: 16, callback(v) { const l = this.getLabelForValue(v); return l ? l.slice(0, 7) : l; } }, grid: { display: false } };
+
+new Chart(cSip, { data: { labels: lbl, datasets: [
+  { type: "line", label: "Supply in profit %", data: S.map(r => r.sip), borderColor: css("--accent"), borderWidth: 2, yAxisID: "y" },
+  { type: "line", label: "Price", data: S.map(r => r.price), borderColor: "transparent", backgroundColor: alpha(css("--faint"), .22), fill: "origin", yAxisID: "p" },
+]}, options: { scales: { x: xTime, y: { min: 0, max: 100, ticks: { callback: v => v + "%" } }, p: { type: "logarithmic", position: "right", grid: { display: false }, ticks: { callback: v => [1e-2, 1e-3, 1e-4, 1e-5].includes(v) ? "$" + v : "" } } } } });
+
+const D = R.depth;
+const dCol = [css("--sell"), alpha(css("--sell"), .75), alpha(css("--sell"), .5), alpha(css("--sell"), .28), alpha(css("--buy"), .55), css("--buy")];
+new Chart(cDepth, { type: "bar", data: { labels: D.labels, datasets: [{ label: "Wallets with 1M+ KEYCAT", data: D.wallets, backgroundColor: dCol, borderRadius: 3 }] },
+  options: { plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { ticks: { precision: 0 } } } } });
+const dTot = D.wallets.reduce((a, b) => a + b, 0), deep = D.wallets[0] + D.wallets[1];
+document.getElementById("depthCap").textContent = `Wallets holding 1M+ KEYCAT, by gain or loss on the coins they still hold. ${fmt(100 * deep / dTot, 0)}% are down more than 75%.`;
+
+new Chart(cRp, { type: "line", data: { labels: lbl, datasets: [
+  { label: "Price", data: S.map(r => r.price), borderColor: css("--ink"), borderWidth: 1.6 },
+  { label: "Realized price", data: S.map(r => r.rp), borderColor: css("--accent"), borderWidth: 2, borderDash: [5, 4] },
+]}, options: { scales: { x: xTime, y: { type: "logarithmic", ticks: { callback: v => [1e-2, 1e-3, 1e-4, 1e-5, 1e-6].includes(v) ? "$" + v : "" } } } } });
+
+new Chart(cFlow, { data: { labels: w52.map(r => r.d), datasets: [
+  { type: "bar", label: "Net buyers", data: w52.map(r => r.netBuyUsd), backgroundColor: alpha(css("--buy"), .75), stack: "s" },
+  { type: "bar", label: "Net sellers", data: w52.map(r => -r.netSellUsd), backgroundColor: alpha(css("--sell"), .75), stack: "s" },
+  { type: "line", label: "Difference", data: w52.map(r => r.netBuyUsd - r.netSellUsd), borderColor: css("--ink"), borderWidth: 1.6 },
+]}, options: { scales: { x: { ...xTime, stacked: true }, y: { stacked: false, ticks: { callback: v => usd(v) } } },
+  plugins: { tooltip: { callbacks: { label: c => `${c.dataset.label}: ${usd(Math.abs(c.raw))}` } } } } });
+
+
+new Chart(cPeople, { type: "line", data: { labels: w52.map(r => r.d), datasets: [
+  { label: "Net buyers", data: w52.map(r => r.netBuyers), borderColor: css("--buy"), borderWidth: 2 },
+  { label: "Net sellers", data: w52.map(r => r.netSellers), borderColor: css("--sell"), borderWidth: 2 },
+]}, options: { scales: { x: xTime, y: { ticks: { precision: 0 } } } } });
+
+new Chart(cHolders, { type: "line", data: { labels: lbl, datasets: [
+  { label: "10k+ KEYCAT", data: S.map(r => r.byBar[i10k]), borderColor: css("--a2"), borderWidth: 2 },
+  { label: "100k+", data: S.map(r => r.byBar[i100k]), borderColor: css("--a3"), borderWidth: 2 },
+  { label: "1M+", data: S.map(r => r.byBar[i1m]), borderColor: css("--a4"), borderWidth: 2.4 },
+]}, options: { scales: { x: xTime, y: { type: "logarithmic", ticks: { callback: v => [300, 500, 1000, 2000, 5000, 10000].includes(v) ? tok(v) : "" } } } } });
+document.getElementById("holdersCap").textContent = `Wallets above each size, log scale. 10k+ peaked at ${fmt(p10k.byBar[i10k])} (${p10k.d}); today ${fmt(cur.byBar[i10k])}.`;
+
+new Chart(cBig, { type: "bar", data: { labels: last(S, 52).map(r => r.d), datasets: [
+  { label: "Joined 1M+", data: last(S, 52).map(r => r.bigIn), backgroundColor: alpha(css("--buy"), .75), stack: "s" },
+  { label: "Left 1M+", data: last(S, 52).map(r => -r.bigOut), backgroundColor: alpha(css("--sell"), .75), stack: "s" },
+]}, options: { scales: { x: { ...xTime, stacked: true }, y: { stacked: true, ticks: { precision: 0, callback: v => Math.abs(v) } } },
+  plugins: { tooltip: { callbacks: { label: c => `${c.dataset.label}: ${Math.abs(c.raw)}` } } } } });
+
+new Chart(cReal, { type: "bar", data: { labels: w52.map(r => r.d), datasets: [
+  { label: "Realized profit", data: w52.map(r => r.rProfit), backgroundColor: alpha(css("--buy"), .75), stack: "s" },
+  { label: "Realized loss", data: w52.map(r => -r.rLoss), backgroundColor: alpha(css("--sell"), .75), stack: "s" },
+]}, options: { scales: { x: { ...xTime, stacked: true }, y: { stacked: true, ticks: { callback: v => usd(v) } } },
+  plugins: { tooltip: { callbacks: { label: c => `${c.dataset.label}: ${usd(Math.abs(c.raw))}` } } } } });
+
+const ages = ["< 1 month", "1–3 months", "3–6 months", "6–12 months", "1 year +"];
+new Chart(cAge, { type: "line", data: { labels: lbl, datasets: ages.map((a, i) => ({
+  label: a, data: S.map(r => r.age[i]), borderWidth: 0, fill: i ? "-1" : "origin",
+  backgroundColor: css("--a" + i), borderColor: css("--a" + i) })) },
+  options: { scales: { x: xTime, y: { stacked: true, min: 0, max: 100, ticks: { callback: v => v + "%" } } } } });
+
+// infrastructure disclosure
+document.getElementById("mInfra").textContent = `${R.exchangeLike.length} such wallets still hold 1M+ KEYCAT (${tok(R.exchangeLike.reduce((a, e) => a + e.bal, 0))} in total) and are treated as exchange or market-maker wallets. Another ${R.routers} pass coins straight through and are treated as routers, so a send to one counts as a sale. None of these labels is verified.`;
+document.getElementById("exT").innerHTML = `<thead><tr><th>Exchange-like wallet</th><th>Balance</th><th>Transfers in</th><th>Transfers out</th></tr></thead><tbody>` +
+  R.exchangeLike.map(e => `<tr><td><a href="https://basescan.org/address/${e.a}" target="_blank" rel="noopener">${short(e.a)}</a></td><td>${tok(e.bal)}</td><td>${fmt(e.txIn)}</td><td>${fmt(e.txOut)}</td></tr>`).join("") + `</tbody>`;
+
+// cohort + top table
+document.getElementById("cohortP").innerHTML = `Wallets that held 1M+ KEYCAT at the start of each window, and what they did since. A change under 5% of the starting balance counts as flat. ` +
+  `The two largest wallets hold ${fmt(100 * (R.top50[0].bal + R.top50[1].bal) / cur.held, 0)}% of all held KEYCAT, and ${exFed.length} of the largest wallets (${exFed.map(t => short(t.a)).join(", ")}) received 90% or more of their coins from the exchange-like wallets listed under Method. ` +
+  `They may be exchange or custody wallets, or whales who withdrew to their own wallet; the chain alone can't tell. Their 30- and 90-day changes are in the table below.`;
+const cr = (k, c) => `<tr><td>Last ${k} days</td><td>${c.add}</td><td>${c.flat}</td><td>${c.cut}</td><td>${c.gone}</td><td>${c.fresh}</td><td class="${c.net >= 0 ? "pos" : "neg"}">${tok(c.net)}</td></tr>`;
+document.getElementById("cohortT").innerHTML = `<thead><tr><th>Window</th><th>Added</th><th>Flat</th><th>Trimmed</th><th>Emptied</th><th>New 1M+</th><th>Net KEYCAT</th></tr></thead><tbody>${cr(30, c30)}${cr(90, c90)}</tbody>`;
+const held = cur.held;
+document.getElementById("topT").innerHTML = `<thead><tr><th>Top 20 wallets</th><th>Balance</th><th>% held</th><th>Avg cost</th><th>P&amp;L</th><th>30d</th><th>90d</th><th>From exch.</th><th>First seen</th></tr></thead><tbody>` +
+  R.top50.slice(0, 20).map(t => `<tr><td><a href="https://basescan.org/address/${t.a}" target="_blank" rel="noopener">${short(t.a)}</a></td><td>${tok(t.bal)}</td><td>${fmt(100 * t.bal / held, 2)}%</td><td>${price(t.avg)}</td><td class="${t.pnl >= 0 ? "pos" : "neg"}">${t.pnl >= 0 ? "+" : ""}${fmt(t.pnl, 0)}%</td><td class="${t.d30 > 0 ? "pos" : t.d30 < 0 ? "neg" : ""}">${t.d30 ? tok(t.d30) : "—"}</td><td class="${t.d90 > 0 ? "pos" : t.d90 < 0 ? "neg" : ""}">${t.d90 ? tok(t.d90) : "—"}</td><td>${fmt(t.fromEx, 0)}%</td><td>${t.since}</td></tr>`).join("") + `</tbody>`;
+</script>
