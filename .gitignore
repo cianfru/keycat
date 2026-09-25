@@ -4,3 +4,5 @@ data/rpc_rows.csv
 data/rpc_done.txt
 data/*.log
 data/part_*
+data/spx/transfers.csv
+data/spx/archive.csv.gz

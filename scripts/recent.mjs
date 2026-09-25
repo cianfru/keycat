@@ -17,40 +17,65 @@
 //
 // Also: of wallets that were net buyers during the June–July low, how much do they still hold?
 //
-//   node --max-old-space-size=7000 scripts/recent.mjs
+//   node --max-old-space-size=7000 scripts/recent.mjs              # KEYCAT
+//   TOKEN_PROFILE=spx node --max-old-space-size=7000 scripts/recent.mjs   # SPX6900 (Ethereum), same rules
+//
+// Every size threshold is set in DOLLARS at the end-date price of the token being measured, so the
+// two tokens are compared on the same money: KEYCAT's 10k/100k/1M/10M tiers ≈ $7/$70/$690/$6.9k, and
+// SPX gets the SPX amounts worth the same. The dust, bot and exchange-fed cutoffs scale the same way.
 import { createReadStream, readFileSync, writeFileSync } from "node:fs";
 import { createInterface } from "node:readline";
-import { TOKEN, EXCLUDE_LABELS } from "../config.mjs";
-import { makePriceAt, makeBook, classifyRows } from "./analyze.mjs";
+import { makePriceAt, makeBook, classifyRows, RULE } from "./analyze.mjs";
+
+const PROFILE = process.env.TOKEN_PROFILE || "keycat";
+const cfg = await import(PROFILE === "spx" ? "../config-spx.mjs" : "../config.mjs");
+const { TOKEN, EXCLUDE_LABELS } = cfg;
+const P = PROFILE === "spx"
+  ? { transfers: "../data/spx/transfers.csv", prices: "../data/spx/prices.json", out: "../public/recent-spx.json" }
+  : { transfers: "../data/transfers.csv", prices: "../data/price_onchain.json", out: "../public/recent.json" };
 
 const DAY = 86400000, EPS = 1e-6;
 const iso = ts => new Date(ts).toISOString().slice(0, 10);
 const LP = new Set(Object.entries(EXCLUDE_LABELS).filter(([, v]) => v.kind === "lp").map(([a]) => a));
-const BARS = [1e4, 1e5, 1e6, 1e7];
+const TAGGED_EX = new Set(Object.entries(EXCLUDE_LABELS).filter(([, v]) => v.kind === "cex" || v.kind === "mm").map(([a]) => a));
 const MIN_USD = 5, NEW_USD = 20, OLD_DAYS = 180;
 const BOT_TRADES = Number(process.env.BOT_TRADES || 300);   // lifetime pool trades that make a wallet market infrastructure
 
-const prices = JSON.parse(readFileSync(new URL("../data/price_onchain.json", import.meta.url)));
+const prices = JSON.parse(readFileSync(new URL(P.prices, import.meta.url)));
 const priceAt = makePriceAt(prices.map(([d, p]) => [d, p]));
 const END = Date.parse(prices.at(-1)[0]) + DAY;          // exclusive end (day after the last price day)
+// Dollar anchors, defined once on KEYCAT's end price (the report's original token thresholds), then
+// converted into this token's units at its own end price.
+const KEYCAT_END = 0.000691844137;
+const USD = tok => tok * KEYCAT_END;
+const toTok = usd => (PROFILE === "keycat" ? usd / KEYCAT_END : usd / prices.at(-1)[1]);   // exact token units for KEYCAT
+const BARS = [1e4, 1e5, 1e6, 1e7].map(t => toTok(USD(t)));
+const FED_MIN = toTok(USD(1e7));
+const rule = { ...RULE, minTok: toTok(USD(RULE.minTok)), keepBal: toTok(USD(RULE.keepBal)) };
 const START = END - 270 * DAY;
 const LOW = [Date.parse("2026-06-01"), Date.parse("2026-08-01")];   // the June–July low
 
 const scale = 10 ** TOKEN.decimals;
-const csv = new URL("../data/transfers.csv", import.meta.url);
+const csv = new URL(P.transfers, import.meta.url);
 async function* rows() {
   const rl = createInterface({ input: createReadStream(csv), crlfDelay: Infinity });
   for await (const line of rl) {
     if (!line || line.startsWith("block")) continue;
     const [, , from, to, time, raw] = line.split(",");
     const amt = Number(raw) / scale;
-    if (amt > EPS) yield [from, to, amt, Date.parse(time)];
+    const ts = Date.parse(time);
+    if (ts >= END) break;                                 // stop at the last priced day
+    if (amt > EPS) yield [from, to, amt, ts];
   }
 }
 
 const pre = [];
 for await (const r of rows()) pre.push([r[0], r[1], r[2]]);
-const { exchange, router } = classifyRows(pre);
+const found = classifyRows(pre, LP, rule);
+// Labelled addresses keep their label (a bridge is not an exchange); tagged exchanges join the set.
+const exchange = new Map([...found.exchange].filter(([a]) => !(a in EXCLUDE_LABELS)));
+for (const a of TAGGED_EX) exchange.set(a, { bal: 0, txIn: 0, txOut: 0, tagged: true });
+const router = new Set([...found.router].filter(a => !(a in EXCLUDE_LABELS)));
 // Second pass over the same rows: lifetime pool trades per wallet (BOTS = 300+ trades: arbitrage and
 // DEX→exchange relays that buy on a pool and forward the coins), and the share of each wallet's
 // inflow that came from exchange-like wallets (EXCHANGE-FED: ≥90% and ≥10M held — custody or a
@@ -65,7 +90,7 @@ for (const [f, t, a] of pre) {
 }
 pre.length = 0;
 const bots = new Set([...trades].filter(([a, n]) => n >= BOT_TRADES && !exchange.has(a) && !router.has(a) && !LP.has(a) && !(a in EXCLUDE_LABELS)).map(([a]) => a));
-const exFed = new Set([...rin].filter(([a, v]) => (rinEx.get(a) || 0) / v >= 0.9 && (bal0.get(a) || 0) >= 1e7 && !exchange.has(a)).map(([a]) => a));
+const exFed = new Set([...rin].filter(([a, v]) => (rinEx.get(a) || 0) / v >= 0.9 && (bal0.get(a) || 0) >= FED_MIN && !exchange.has(a) && !(a in EXCLUDE_LABELS)).map(([a]) => a));
 const MARKET = new Set([...LP, ...router, ...bots]);
 const EXCL = new Set([...Object.keys(EXCLUDE_LABELS), ...exchange.keys(), ...router, ...bots]);
 const cls = a => (LP.has(a) ? "lp" : exchange.has(a) ? "ex" : router.has(a) || bots.has(a) ? "bot" : a in EXCLUDE_LABELS ? "out" : exFed.has(a) ? "fed" : "holder");
@@ -194,5 +219,5 @@ let nb = 0, nbHold = 0, nbTok = 0, nbHeldTok = 0;
 for (const [a, got] of newA) { nb++; nbTok += got; const b = book.W.get(a)?.bal ?? 0; if (b >= got * 0.5) nbHold++; nbHeldTok += Math.min(b, got); }
 const newBuyerRetention = { wallets: nb, stillHoldHalfPct: +(100 * nbHold / nb).toFixed(1), tokensStillHeldPct: +(100 * nbHeldTok / nbTok).toFixed(1) };
 console.log(JSON.stringify({ newBuyerRetention }));
-writeFileSync(new URL("../public/recent.json", import.meta.url), JSON.stringify({ updated: series.at(-1).d, bars: BARS, windows, lowBuyers, newBuyerRetention, infra: { exchange: exchange.size, router: router.size, bots: bots.size, exFed: [...exFed] }, series }));
+writeFileSync(new URL(P.out, import.meta.url), JSON.stringify({ token: TOKEN.symbol, updated: series.at(-1).d, bars: BARS, barsUsd: BARS.map(b => +(b * prices.at(-1)[1]).toFixed(2)), windows, lowBuyers, newBuyerRetention, infra: { exchange: exchange.size, router: router.size, bots: bots.size, exFed: [...exFed] }, series }));
 console.log(JSON.stringify({ windows, lowBuyers }, null, 1));

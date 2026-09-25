@@ -86,6 +86,9 @@ td a{color:var(--accent);text-decoration:none} td a:hover{text-decoration:underl
   <h2>Any signs of life?</h2>
   <p id="lifeP"></p>
   <div class="tbl"><table id="lifeT"></table></div>
+  <h3>Against SPX6900 over the same 90 days</h3>
+  <p id="cmpP"></p>
+  <div class="tbl"><table id="cmpT"></table></div>
   <div class="row2">
     <figure><div class="cv"><canvas id="cHold" aria-label="KEYCAT held by holder wallets, last 180 days"></canvas></div>
       <figcaption>KEYCAT in ordinary holder wallets (teal) and in the few exchange-fed wallets (grey), with price. Last 180 days.</figcaption></figure>
@@ -159,6 +162,7 @@ td a{color:var(--accent);text-decoration:none} td a:hover{text-decoration:underl
 <script>
 const R = /*DATA*/null;
 const RC = /*RECENT*/null;
+const RS = /*RECENTSPX*/null;
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const fmt = (v, d = 0) => v.toLocaleString("en-US", { maximumFractionDigits: d, minimumFractionDigits: d });
 const usd = v => { const a = Math.abs(v); const s = v < 0 ? "−$" : "$"; return a >= 1e6 ? s + fmt(a / 1e6, 2) + "M" : a >= 1e3 ? s + fmt(a / 1e3, 1) + "k" : s + fmt(a, 0); };
@@ -323,6 +327,41 @@ new Chart(cAge, { type: "line", data: { labels: lbl, datasets: ages.map((a, i) =
     { type: "line", label: "Net sellers / day", data: wk.map(r => r.s), borderColor: css("--sell"), borderWidth: 2, yAxisID: "y" },
   ]}, options: { scales: { x: xTime, y: { ticks: { precision: 0 } } } } });
   document.getElementById("newCap").textContent = `Weekly first-time buyers (a wallet's first KEYCAT, worth $20+, from a pool or exchange) and the average number of wallets buying and selling per day. Of the ${fmt(NR.wallets)} first-time buyers in the last 90 days, ${fmt(NR.stillHoldHalfPct, 0)}% still hold half or more. Of ${LB.wallets} wallets that bought the June–July low, ${LB.soldAll} have sold everything.`;
+}
+
+
+// ── KEYCAT vs SPX6900, same rules, same dollar tiers ──
+{
+  const K = RC.windows.A, X = RS.windows.A, KB = RC.windows.B, XB = RS.windows.B;
+  const ch = (a, b) => (b ? 100 * (a / b - 1) : 0);
+  const pc = v => `${v >= 0 ? "+" : "−"}${fmt(Math.abs(v), 1)}%`;
+  const cls = v => (v >= 0 ? "pos" : "neg");
+  const lossShare = w => 100 * w.rLoss / (w.rLoss + w.rProfit);
+  const rows = [
+    ["Price", K.priceChangePct, X.priceChangePct, "pct"],
+    ["Holders' net buying", K.netUsd, X.netUsd, "usd"],
+    ["… as a share of pool volume", 100 * K.netUsd / K.grossUsd, 100 * X.netUsd / X.grossUsd, "pct"],
+    ["KEYCAT / SPX held by holder wallets", 100 * K.holderChange / K.holderStart, 100 * X.holderChange / X.holderStart, "pct"],
+    ["… including exchange-fed wallets", ch(K.holderEnd + K.fedEnd, K.holderStart + K.fedStart), ch(X.holderEnd + X.fedEnd, X.holderStart + X.fedStart), "pct"],
+    [`Wallets worth $${fmt(RC.barsUsd[1])}+`, ch(K.barsEnd[1], K.barsStart[1]), ch(X.barsEnd[1], X.barsStart[1]), "pct"],
+    [`Wallets worth $${fmt(RC.barsUsd[2])}+`, ch(K.barsEnd[2], K.barsStart[2]), ch(X.barsEnd[2], X.barsStart[2]), "pct"],
+    [`Wallets worth $${fmt(RC.barsUsd[3])}+`, ch(K.barsEnd[3], K.barsStart[3]), ch(X.barsEnd[3], X.barsStart[3]), "pct"],
+    ["First-time buyers", K.newBuyers, X.newBuyers, "n"],
+    ["… average first buy", K.newUsd / K.newBuyers, X.newUsd / X.newBuyers, "usd0"],
+    ["… still holding half or more", RC.newBuyerRetention.stillHoldHalfPct, RS.newBuyerRetention.stillHoldHalfPct, "share"],
+    ["June–July low buyers who sold everything", 100 * RC.lowBuyers.soldAll / RC.lowBuyers.wallets, 100 * RS.lowBuyers.soldAll / RS.lowBuyers.wallets, "share"],
+    ["Coins held 180d+ sold, % of holder supply", 100 * K.oldSoldTok / K.holderStart, 100 * X.oldSoldTok / X.holderStart, "share"],
+    ["Loss share of sellers' realized P&amp;L", lossShare(K), lossShare(X), "share"],
+  ];
+  const f = (v, t) => t === "usd" ? `<span class="${cls(v)}">${usd(v)}</span>` : t === "usd0" ? usd(v) : t === "n" ? fmt(v) : t === "share" ? fmt(v, 0) + "%" : `<span class="${cls(v)}">${pc(v)}</span>`;
+  document.getElementById("cmpT").innerHTML = `<thead><tr><th>Last 90 days</th><th>KEYCAT</th><th>SPX6900</th></tr></thead><tbody>` +
+    rows.map(([l, a, b, t]) => `<tr><td>${l}</td><td>${f(a, t)}</td><td>${f(b, t)}</td></tr>`).join("") + `</tbody>`;
+  document.getElementById("cmpP").innerHTML =
+    `The same script, rules and dollar-sized tiers run on SPX6900's Ethereum transfers. SPX's holders were also net sellers over these 90 days, so part of this is the market. ` +
+    `The difference is the rate. KEYCAT holders sold ${fmt(-100 * K.netUsd / K.grossUsd, 0)}% of pool volume net, against ${fmt(-100 * X.netUsd / X.grossUsd, 0)}% for SPX. KEYCAT's $${fmt(RC.barsUsd[2])}+ wallets fell ${fmt(-ch(K.barsEnd[2], K.barsStart[2]), 0)}% against SPX's ${fmt(-ch(X.barsEnd[2], X.barsStart[2]), 0)}%. ` +
+    `Its first-time buyers came in smaller and left faster: ${fmt(RC.newBuyerRetention.stillHoldHalfPct, 0)}% still hold, against ${fmt(RS.newBuyerRetention.stillHoldHalfPct, 0)}% for SPX. ` +
+    `In the 90 days before, SPX holders were net buyers of ${usd(XB.netUsd)}; KEYCAT's were close to even at ${usd(KB.netUsd)}. ` +
+    `SPX here is Ethereum only (about 94% of its value) and has 70+ exchange wallets tagged by hand, so many of its 259 exchange-fed wallets are ordinary people withdrawing from Coinbase or Kraken.`;
 }
 
 // infrastructure disclosure

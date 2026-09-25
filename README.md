@@ -18,6 +18,9 @@ chain data and can be regenerated with the three commands below. No API keys nee
 python3 scripts/pull_transfers_rpc.py     # every Transfer log since launch → data/transfers.csv (~20-40 min, public RPCs)
 python3 scripts/pull_price_onchain.py     # daily price from the V2 pool's reserves × Coinbase ETH/USD
 node --max-old-space-size=6000 scripts/analyze.mjs   # FIFO replay → public/report.json
+node --max-old-space-size=7000 scripts/recent.mjs   # last 90 days vs the two windows before → public/recent.json
+python3 scripts/spx_pull.py               # SPX6900 (Ethereum) transfers: the_terminal's public archive + a public-RPC tail
+TOKEN_PROFILE=spx node --max-old-space-size=7000 scripts/recent.mjs   # same analysis on SPX → public/recent-spx.json
 node scripts/build-report.mjs             # → report/keycat-report.html (self-contained page)
 node --test test/*.test.mjs
 ```
