@@ -2,6 +2,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 const R = JSON.parse(readFileSync(new URL("../public/report.json", import.meta.url)));
 const tpl = readFileSync(new URL("../report/template.html", import.meta.url), "utf8");
+const RC = JSON.parse(readFileSync(new URL("../public/recent.json", import.meta.url)));
 const { exclude, token, ...data } = R;
-writeFileSync(new URL("../report/keycat-report.html", import.meta.url), tpl.replace("/*DATA*/null", JSON.stringify(data)));
+writeFileSync(new URL("../report/keycat-report.html", import.meta.url), tpl.replace("/*DATA*/null", JSON.stringify(data)).replace("/*RECENT*/null", JSON.stringify(RC)));
 console.log("✓ report/keycat-report.html");

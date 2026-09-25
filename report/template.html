@@ -82,7 +82,20 @@ td a{color:var(--accent);text-decoration:none} td a:hover{text-decoration:underl
 <div class="stats" id="stats"></div>
 
 <section>
-  <div class="eyebrow">01 · Underwater</div>
+  <div class="eyebrow">01 · Last 90 days</div>
+  <h2>Any signs of life?</h2>
+  <p id="lifeP"></p>
+  <div class="tbl"><table id="lifeT"></table></div>
+  <div class="row2">
+    <figure><div class="cv"><canvas id="cHold" aria-label="KEYCAT held by holder wallets, last 180 days"></canvas></div>
+      <figcaption>KEYCAT in ordinary holder wallets (teal) and in the few exchange-fed wallets (grey), with price. Last 180 days.</figcaption></figure>
+    <figure><div class="cv"><canvas id="cNew" aria-label="First-time buyers per week"></canvas></div>
+      <figcaption id="newCap"></figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">02 · Underwater</div>
   <h2>How many holders are underwater</h2>
   <p>Every coin still held is traced to the price it was received at (first in, first out). A holder is underwater when the remaining coins cost more, on average, than KEYCAT trades for today.</p>
   <div class="row2">
@@ -96,7 +109,7 @@ td a{color:var(--accent);text-decoration:none} td a:hover{text-decoration:underl
 </section>
 
 <section>
-  <div class="eyebrow">02 · Buying pressure</div>
+  <div class="eyebrow">03 · Buying pressure</div>
   <h2>Who is buying and who is selling on the DEX pools</h2>
   <p>Coins leaving a KEYCAT pool or aggregator to a wallet are buys; coins sent into one are sells. Arbitrage bots buy on one pool and sell on another, so each wallet's trades are netted over the week first. A wallet counts as a buyer or seller only if its weekly net is at least $5.</p>
   <figure><div class="cv tall"><canvas id="cFlow" aria-label="Weekly net buying and net selling in USD"></canvas></div>
@@ -106,7 +119,7 @@ td a{color:var(--accent);text-decoration:none} td a:hover{text-decoration:underl
 </section>
 
 <section>
-  <div class="eyebrow">03 · Exits</div>
+  <div class="eyebrow">04 · Exits</div>
   <h2>Are people leaving</h2>
   <div class="row2">
     <figure><div class="cv"><canvas id="cHolders" aria-label="Holders by size over time"></canvas></div>
@@ -123,7 +136,7 @@ td a{color:var(--accent);text-decoration:none} td a:hover{text-decoration:underl
 </section>
 
 <section>
-  <div class="eyebrow">04 · Big holders</div>
+  <div class="eyebrow">05 · Big holders</div>
   <h2>What the biggest wallets are doing</h2>
   <p id="cohortP"></p>
   <div class="tbl"><table id="cohortT"></table></div>
@@ -145,6 +158,7 @@ td a{color:var(--accent);text-decoration:none} td a:hover{text-decoration:underl
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
 const R = /*DATA*/null;
+const RC = /*RECENT*/null;
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const fmt = (v, d = 0) => v.toLocaleString("en-US", { maximumFractionDigits: d, minimumFractionDigits: d });
 const usd = v => { const a = Math.abs(v); const s = v < 0 ? "−$" : "$"; return a >= 1e6 ? s + fmt(a / 1e6, 2) + "M" : a >= 1e3 ? s + fmt(a / 1e3, 1) + "k" : s + fmt(a, 0); };
@@ -275,6 +289,41 @@ new Chart(cAge, { type: "line", data: { labels: lbl, datasets: ages.map((a, i) =
   label: a, data: S.map(r => r.age[i]), borderWidth: 0, fill: i ? "-1" : "origin",
   backgroundColor: css("--a" + i), borderColor: css("--a" + i) })) },
   options: { scales: { x: xTime, y: { stacked: true, min: 0, max: 100, ticks: { callback: v => v + "%" } } } } });
+
+
+// ── last 90 days ──
+{
+  const Wn = RC.windows, A = Wn.A, B = Wn.B, C = Wn.C, NR = RC.newBuyerRetention, LB = RC.lowBuyers;
+  const pct = (a, b) => (b ? 100 * (a / b - 1) : 0);
+  const sg = v => (v >= 0 ? "+" : "−") + fmt(Math.abs(v), 0);
+  document.getElementById("lifeP").innerHTML =
+    `The last 90 days (${A.from} to ${A.to}) had the only real spark of 2026. Price rose ${fmt(A.priceChangePct, 0)}%, and in the second half of August pool volume and first-time buyers jumped several-fold. ` +
+    `It didn't hold. Ordinary holder wallets <b>sold ${usd(-A.netUsd)} more than they bought</b> over the 90 days and hold ${tok(-A.holderChange)} fewer KEYCAT than at the start. ` +
+    `Only ${fmt(NR.stillHoldHalfPct, 0)}% of the ${fmt(NR.wallets)} first-time buyers still hold at least half of what they bought. Wallets with 1M+ KEYCAT fell from ${fmt(A.barsStart[2])} to ${fmt(A.barsEnd[2])}. ` +
+    `The coins that stayed went to ${RC.infra.exFed.length} wallets funded almost entirely by exchange-like wallets; they gained ${tok(A.fedEnd - A.fedStart)}. ` +
+    `Bots are excluded throughout (${fmt(RC.infra.bots)} wallets with 300+ pool trades); a 1,000-trade cutoff gives the same answer.`;
+  const row = (name, w) => `<tr><td>${name}<br><span style="color:var(--dim);font-size:12px">${w.from} → ${w.to}</span></td>` +
+    `<td class="${w.priceChangePct >= 0 ? "pos" : "neg"}">${sg(w.priceChangePct)}%</td>` +
+    `<td class="${w.netUsd >= 0 ? "pos" : "neg"}">${usd(w.netUsd)}</td>` +
+    `<td class="${w.holderChange >= 0 ? "pos" : "neg"}">${tok(w.holderChange)}</td>` +
+    `<td>${fmt(w.newBuyers)}</td><td>${fmt(w.barsStart[2])} → ${fmt(w.barsEnd[2])}</td><td>${fmt(w.barsStart[1])} → ${fmt(w.barsEnd[1])}</td>` +
+    `<td>${tok(w.oldSoldTok)}</td><td>${usd(w.rProfit)} / ${usd(w.rLoss)}</td></tr>`;
+  document.getElementById("lifeT").innerHTML = `<thead><tr><th>90 days</th><th>Price</th><th>Holders' net $</th><th>Held by holders</th><th>First-time buyers</th><th>1M+ wallets</th><th>100k+ wallets</th><th>180d+ coins sold</th><th>Realized profit / loss</th></tr></thead><tbody>` +
+    row("Last 90 days", A) + row("90 days before", B) + row("90 before that", C) + `</tbody>`;
+  const s180 = RC.series.slice(-180);
+  new Chart(cHold, { data: { labels: s180.map(r => r.d), datasets: [
+    { type: "line", label: "Holder wallets", data: s180.map(r => r.supply.holder / 1e6), borderColor: css("--accent"), borderWidth: 2, yAxisID: "y" },
+    { type: "line", label: "Exchange-fed wallets", data: s180.map(r => r.supply.fed / 1e6), borderColor: css("--faint"), borderWidth: 2, yAxisID: "y" },
+    { type: "line", label: "Price", data: s180.map(r => r.price), borderColor: "transparent", backgroundColor: alpha(css("--faint"), .18), fill: "origin", yAxisID: "p" },
+  ]}, options: { scales: { x: xTime, y: { ticks: { callback: v => fmt(v / 1000, 1) + "B" } }, p: { type: "logarithmic", position: "right", grid: { display: false }, ticks: { callback: v => [2e-4, 5e-4, 1e-3].includes(v) ? "$" + v : "" } } } } });
+  const wk = []; for (let i = 0; i < s180.length; i += 7) { const c = s180.slice(i, i + 7); wk.push({ d: c[0].d, n: c.reduce((a, r) => a + r.newBuyers, 0), b: c.reduce((a, r) => a + r.buyers, 0) / c.length, s: c.reduce((a, r) => a + r.sellers, 0) / c.length }); }
+  new Chart(cNew, { data: { labels: wk.map(r => r.d), datasets: [
+    { type: "bar", label: "First-time buyers", data: wk.map(r => r.n), backgroundColor: alpha(css("--accent"), .7), yAxisID: "y" },
+    { type: "line", label: "Net buyers / day", data: wk.map(r => r.b), borderColor: css("--buy"), borderWidth: 2, yAxisID: "y" },
+    { type: "line", label: "Net sellers / day", data: wk.map(r => r.s), borderColor: css("--sell"), borderWidth: 2, yAxisID: "y" },
+  ]}, options: { scales: { x: xTime, y: { ticks: { precision: 0 } } } } });
+  document.getElementById("newCap").textContent = `Weekly first-time buyers (a wallet's first KEYCAT, worth $20+, from a pool or exchange) and the average number of wallets buying and selling per day. Of the ${fmt(NR.wallets)} first-time buyers in the last 90 days, ${fmt(NR.stillHoldHalfPct, 0)}% still hold half or more. Of ${LB.wallets} wallets that bought the June–July low, ${LB.soldAll} have sold everything.`;
+}
 
 // infrastructure disclosure
 document.getElementById("mInfra").textContent = `${R.exchangeLike.length} such wallets still hold 1M+ KEYCAT (${tok(R.exchangeLike.reduce((a, e) => a + e.bal, 0))} in total) and are treated as exchange or market-maker wallets. Another ${R.routers} pass coins straight through and are treated as routers, so a send to one counts as a sale. None of these labels is verified.`;
