@@ -6,3 +6,5 @@ data/*.log
 data/part_*
 data/spx/transfers.csv
 data/spx/archive.csv.gz
+data/sol/*.json
+!data/sol/activity.json

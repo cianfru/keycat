@@ -1,0 +1,208 @@
+<title>Memecoin Holder Bases</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#f5f6f4; --panel:#ffffff; --ink:#1b2026; --dim:#4f5963; --faint:#8a939c; --line:#dde1dd;
+  --accent:#0d6b6b; --buy:#25884a; --sell:#c23b2a; --warn:#b7791f;
+  --a0:#e76f51; --a1:#f4a261; --a2:#e9c46a; --a3:#6aa9a3; --a4:#1f5f6b;
+  --c0:#0d6b6b; --c1:#c77d12; --c2:#7a4fb5; --c3:#6b7785;
+  --key:#eceee9; --keyedge:#c9cec8;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#12161a; --panel:#1a1f24; --ink:#eef1f3; --dim:#b3bcc4; --faint:#7d8791; --line:#2c343b;
+  --accent:#4fb3b0; --buy:#4cc47a; --sell:#f06a57; --warn:#e2a33f;
+  --a0:#ef8266; --a1:#f5b27a; --a2:#ecd083; --a3:#7fbdb6; --a4:#4f95a3;
+  --c0:#4fb3b0; --c1:#e2a33f; --c2:#a888dd; --c3:#9aa6b2;
+  --key:#232a30; --keyedge:#3a434b; color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --bg:#12161a; --panel:#1a1f24; --ink:#eef1f3; --dim:#b3bcc4; --faint:#7d8791; --line:#2c343b;
+  --accent:#4fb3b0; --buy:#4cc47a; --sell:#f06a57; --warn:#e2a33f;
+  --a0:#ef8266; --a1:#f5b27a; --a2:#ecd083; --a3:#7fbdb6; --a4:#4f95a3;
+  --c0:#4fb3b0; --c1:#e2a33f; --c2:#a888dd; --c3:#9aa6b2;
+  --key:#232a30; --keyedge:#3a434b; color-scheme:dark; }
+body{background:var(--bg);color:var(--ink);font:16px/1.6 "IBM Plex Sans",system-ui,sans-serif;margin:0}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:20px;padding-block:40px 64px;display:flex;flex-direction:column;gap:44px}
+h1,h2,h3{font-family:Archivo,"Helvetica Neue",Arial,sans-serif;text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(30px,5vw,46px);font-weight:800;letter-spacing:-.01em}
+h2{font-size:24px;font-weight:700}
+h3{font-size:16px;font-weight:700}
+.eyebrow{font:500 12px/1 "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.mono,.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+p{margin:0;max-width:68ch;color:var(--ink)}
+.lede{font-size:18px;color:var(--dim)}
+header{display:flex;flex-direction:column;gap:14px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 18px;color:var(--dim);font-size:14px}
+.meta a{color:var(--accent)}
+/* keycap chips: the one keyboard nod */
+.key{display:inline-block;font:500 12px/1 "IBM Plex Mono",monospace;letter-spacing:.04em;padding:6px 8px 5px;border-radius:5px;background:var(--key);border:1px solid var(--keyedge);border-bottom-width:3px;color:var(--ink);text-transform:uppercase;white-space:nowrap}
+.key.bad{color:var(--sell)} .key.good{color:var(--buy)} .key.mid{color:var(--warn)}
+.verdict{display:flex;flex-direction:column;gap:14px;padding:22px;background:var(--panel);border:1px solid var(--line);border-radius:10px}
+.verdict ul{margin:0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:12px}
+.verdict li{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:baseline}
+.verdict li .key{min-width:84px;text-align:center}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.stat{background:var(--panel);padding:16px 18px;display:flex;flex-direction:column;gap:6px}
+.stat .v{font:500 26px/1.1 "IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+.stat .l{font-size:13px;color:var(--dim);line-height:1.35}
+section{display:flex;flex-direction:column;gap:16px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+@media (max-width:760px){ .grid2{grid-template-columns:1fr} }
+.row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+figure{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 16px 10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+figcaption{font-size:13px;color:var(--dim);line-height:1.45}
+.cv{position:relative;height:300px;width:100%}
+.cv.tall{height:340px}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font:500 12px/1.2 "IBM Plex Mono",monospace;letter-spacing:.04em;text-transform:uppercase;color:var(--dim);background:var(--bg)}
+td:first-child,th:first-child{text-align:left}
+td{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+td a{color:var(--accent);text-decoration:none} td a:hover{text-decoration:underline}
+.pos{color:var(--buy)} .neg{color:var(--sell)}
+.method{font-size:14px;color:var(--dim);display:flex;flex-direction:column;gap:10px}
+.method p{color:var(--dim);max-width:80ch}
+.method b{color:var(--ink)}
+@media (max-width:520px){ .wrap{padding-inline:16px} .cv{height:250px} .cv.tall{height:290px} .verdict li{grid-template-columns:1fr} }
+</style>
+<div class="wrap">
+<header>
+  <div class="eyebrow">Ethereum · Solana · Base · holder snapshot <span id="asof"></span></div>
+  <h1>SPX6900, FARTCOIN, BOME and KEYCAT, holder for holder</h1>
+  <p class="lede" id="lede"></p>
+</header>
+
+<div class="verdict">
+  <h2>What stands out</h2>
+  <ul id="verdict"></ul>
+</div>
+
+<div class="tbl"><table id="sizeT"></table></div>
+
+<section>
+  <div class="eyebrow">01 · Holder base</div>
+  <h2>How many wallets hold a real amount</h2>
+  <p>Every wallet with a balance, valued at today's price. Pools, program accounts and wallets that trade like exchange hot wallets are left out. The same dollar cut-offs apply to all four coins.</p>
+  <div class="row2">
+    <figure><div class="cv tall"><canvas id="cTiers" aria-label="Wallets by dollar value"></canvas></div>
+      <figcaption>Wallets holding at least each amount, log scale.</figcaption></figure>
+    <figure><div class="cv tall"><canvas id="cPer" aria-label="Wallets per million dollars of market cap"></canvas></div>
+      <figcaption>The same counts per $1M of market cap. Higher means the value is spread across more people.</figcaption></figure>
+  </div>
+  <div class="tbl"><table id="tierT"></table></div>
+</section>
+
+<section>
+  <div class="eyebrow">02 · Who holds it</div>
+  <h2>Concentration and trading</h2>
+  <p id="concP"></p>
+  <div class="tbl"><table id="concT"></table></div>
+</section>
+
+<section>
+  <div class="eyebrow">03 · The last year</div>
+  <h2>Price and trading activity</h2>
+  <div class="row2">
+    <figure><div class="cv tall"><canvas id="cPx" aria-label="Price indexed to 100 a year ago"></canvas></div>
+      <figcaption>Price, indexed to 100 a year ago, log scale.</figcaption></figure>
+    <figure><div class="cv tall"><canvas id="cTurn" aria-label="Daily volume as a share of market cap"></canvas></div>
+      <figcaption>Daily trading volume as a share of market cap, 30-day average, log scale. All venues, as reported by CoinGecko.</figcaption></figure>
+  </div>
+  <div class="tbl"><table id="trendT"></table></div>
+</section>
+
+<section>
+  <div class="eyebrow">04 · Largest wallets</div>
+  <h2>The biggest holders of each coin</h2>
+  <p>After removing pools, program accounts and hot-wallet traders. Large wallets that trade slowly can still be exchange cold storage; the chain alone can't tell. Check the biggest on an explorer before quoting a concentration number.</p>
+  <div class="grid2" id="tops"></div>
+</section>
+
+<section class="method">
+  <div class="eyebrow">Method</div>
+  <h2>How these numbers were made</h2>
+  <p><b>Solana (FARTCOIN, BOME, SPX on Solana).</b> One <span class="mono">getProgramAccounts</span> call on the public Solana RPC lists every token account of the mint with its owner and balance; balances are summed per owner. Owners that are program-derived addresses (pools, vaults, lockers) are removed. For the 40 largest remaining owners of each coin, a wallet whose last 1,000 transactions happened within 24 hours is treated as an exchange or market maker and removed.</p>
+  <p><b>SPX on Ethereum and KEYCAT on Base.</b> Balances come from replaying every transfer since launch. Hand-labelled pools and exchanges (76 for SPX) and the behavioural exchange-like wallets are removed. SPX on Base (about 3% of its value) is not included, so SPX's counts are slightly low.</p>
+  <p><b>Prices, market caps and volume</b> are one CoinGecko fetch plus its free 365-day history. Volume includes centralised exchanges.</p>
+  <p><b>What this can't show yet.</b> A snapshot says who holds now, not who bought or sold. The 90-day flow analysis done for KEYCAT and SPX needs the full transfer history, which isn't available for free on Solana. Daily snapshots from today would start measuring it.</p>
+  <p><b>Reproduce.</b> <span class="mono">python3 scripts/sol_snapshot.py &lt;name&gt; &lt;mint&gt;</span>, <span class="mono">python3 scripts/sol_classify.py bome fartcoin spxsol</span>, <span class="mono">python3 scripts/peers.py</span>, <span class="mono">node scripts/build-peers.mjs</span> in the keycat repository.</p>
+</section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const PR = /*PEERS*/null;
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fmt = (v, d = 0) => v.toLocaleString("en-US", { maximumFractionDigits: d, minimumFractionDigits: d });
+const usd = v => { const a = Math.abs(v); const s = v < 0 ? "−$" : "$"; return a >= 1e9 ? s + fmt(a / 1e9, 2) + "B" : a >= 1e6 ? s + fmt(a / 1e6, a >= 1e8 ? 0 : 1) + "M" : a >= 1e3 ? s + fmt(a / 1e3, 1) + "k" : s + fmt(a, 0); };
+const pc = v => `<span class="${v >= 0 ? "pos" : "neg"}">${v >= 0 ? "+" : "−"}${fmt(Math.abs(v), 0)}%</span>`;
+const alpha = (c, a) => c.startsWith("#") ? c + Math.round(a * 255).toString(16).padStart(2, "0") : c;
+const K = ["spx", "fartcoin", "bome", "keycat"];
+const C = PR.coins, T = PR.tiers;
+const col = k => css("--c" + K.indexOf(k));
+const nm = k => C[k].symbol === "SPX" ? "SPX6900" : C[k].symbol;
+document.getElementById("asof").textContent = "· " + PR.taken;
+
+const r = (k, t) => C[k].wallets[String(t)];
+const ratio = (a, b, t) => r(a, t) / r(b, t);
+document.getElementById("lede").textContent =
+  `Four memecoins, valued the same way: every wallet that holds each coin today, counted at the same dollar sizes, next to price and trading history. ` +
+  `SPX6900 is worth ${usd(C.spx.mcap)}, FARTCOIN ${usd(C.fartcoin.mcap)}, BOME ${usd(C.bome.mcap)} and KEYCAT ${usd(C.keycat.mcap)}.`;
+
+const chip = (cls, t) => `<span class="key ${cls}">${t}</span>`;
+const V = [
+  [chip("good", "SPX widest"), `SPX6900 has <b>${fmt(r("spx", 1000))}</b> wallets holding $1k or more, against <b>${fmt(r("fartcoin", 1000))}</b> for FARTCOIN and <b>${fmt(r("bome", 1000))}</b> for BOME. That is ${fmt(ratio("spx", "fartcoin", 1000), 1)}× FARTCOIN with ${fmt(C.spx.mcap / C.fartcoin.mcap, 1)}× the market cap, so SPX's value is spread across more serious holders per dollar.`],
+  [chip("mid", "FARTCOIN real, thinner"), `FARTCOIN's base is real: ${fmt(r("fartcoin", 10))} wallets with $10+ and ${fmt(r("fartcoin", 100000))} with $100k+. But the top 100 wallets hold ${fmt(C.fartcoin.top100PctOfHeld, 0)}% of what ordinary wallets hold (SPX ${fmt(C.spx.top100PctOfHeld, 0)}%), and it trades ${fmt(C.fartcoin.trend.last90.avgTurnoverPct, 0)}% of its market cap a day against ${fmt(C.spx.trend.last90.avgTurnoverPct, 1)}% for SPX.`],
+  [chip("bad", "BOME concentrated"), `BOME has ${fmt(r("bome", 1000))} wallets with $1k+, about the same as KEYCAT (${fmt(r("keycat", 1000))}) at ${fmt(C.bome.mcap / C.keycat.mcap, 0)}× the market cap. Its top 10 wallets hold ${fmt(C.bome.top10PctOfHeld, 0)}% of everything held outside pools; one wallet alone has ${fmt(100 * C.bome.top[0][1] / C.bome.circ, 0)}% of supply.`],
+  [chip("mid", "BOME is traded"), `BOME's daily volume averaged ${fmt(C.bome.trend.last90.avgTurnoverPct, 0)}% of its market cap over the last 90 days and its price rose ${fmt(C.bome.trend.last90.priceChangePct, 0)}%. Most of that activity is on exchanges, not in wallets.`],
+  [chip("good", "median holder"), `Among wallets with $100+, the median holding is ${usd(C.spx.medianUsdOf100plus)} for SPX, ${usd(C.fartcoin.medianUsdOf100plus)} for FARTCOIN, ${usd(C.bome.medianUsdOf100plus)} for BOME and ${usd(C.keycat.medianUsdOf100plus)} for KEYCAT.`],
+];
+document.getElementById("verdict").innerHTML = V.map(([k, t]) => `<li>${k}<span>${t}</span></li>`).join("");
+
+document.getElementById("sizeT").innerHTML = `<thead><tr><th>Coin</th><th>Chain</th><th>Market cap</th><th>Price</th><th>From high</th><th>High</th></tr></thead><tbody>` +
+  K.map(k => `<tr><td style="font-family:inherit"><b>${nm(k)}</b></td><td>${C[k].chains}</td><td>${usd(C[k].mcap)}</td><td>$${C[k].price < 0.01 ? C[k].price.toPrecision(3) : C[k].price.toFixed(3)}</td><td>${pc(C[k].fromAthPct)}</td><td>${C[k].athDate}</td></tr>`).join("") + `</tbody>`;
+
+Chart.defaults.font.family = '"IBM Plex Sans", system-ui, sans-serif';
+Chart.defaults.font.size = 12; Chart.defaults.color = css("--dim"); Chart.defaults.borderColor = css("--line");
+Chart.defaults.maintainAspectRatio = false; Chart.defaults.plugins.legend.labels.boxWidth = 12;
+Chart.defaults.plugins.tooltip.mode = "index"; Chart.defaults.plugins.tooltip.intersect = false;
+Chart.defaults.elements.point.radius = 0;
+Chart.defaults.animation = matchMedia("(prefers-reduced-motion: reduce)").matches ? false : { duration: 500 };
+const tierLbl = T.map(t => "$" + (t >= 1000 ? fmt(t / 1000) + "k" : t) + "+");
+new Chart(cTiers, { type: "bar", data: { labels: tierLbl, datasets: K.map(k => ({ label: nm(k), data: T.map(t => r(k, t)), backgroundColor: col(k), borderRadius: 2 })) },
+  options: { scales: { x: { grid: { display: false } }, y: { type: "logarithmic", ticks: { callback: v => [10, 100, 1000, 10000, 100000].includes(v) ? fmt(v) : "" } } } } });
+new Chart(cPer, { type: "bar", data: { labels: tierLbl, datasets: K.map(k => ({ label: nm(k), data: T.map(t => C[k].perMcapMillion[String(t)]), backgroundColor: col(k), borderRadius: 2 })) },
+  options: { scales: { x: { grid: { display: false } }, y: { type: "logarithmic", ticks: { callback: v => [0.1, 1, 10, 100, 1000].includes(v) ? fmt(v, v < 1 ? 1 : 0) : "" } } } } });
+document.getElementById("tierT").innerHTML = `<thead><tr><th>Wallets holding</th>${K.map(k => `<th>${nm(k)}</th>`).join("")}</tr></thead><tbody>` +
+  T.map((t, i) => `<tr><td>${tierLbl[i]}</td>${K.map(k => `<td>${fmt(r(k, t))}</td>`).join("")}</tr>`).join("") +
+  `<tr><td>$1k+ per $1M of market cap</td>${K.map(k => `<td>${fmt(C[k].perMcapMillion["1000"], 1)}</td>`).join("")}</tr></tbody>`;
+
+document.getElementById("concP").textContent = `Shares are of the coins held by ordinary wallets, after removing pools, program accounts and hot-wallet traders. Turnover is average daily volume divided by market cap: a holder's coin turns over slowly, a trading vehicle fast.`;
+document.getElementById("concT").innerHTML = `<thead><tr><th></th>${K.map(k => `<th>${nm(k)}</th>`).join("")}</tr></thead><tbody>` +
+  [["Top 10 wallets' share", k => fmt(C[k].top10PctOfHeld, 0) + "%"],
+   ["Top 100 wallets' share", k => fmt(C[k].top100PctOfHeld, 0) + "%"],
+   ["Supply in ordinary wallets", k => fmt(C[k].heldPctOfCirc, 0) + "%"],
+   ["Median holding (wallets with $100+)", k => usd(C[k].medianUsdOf100plus)],
+   ["Daily volume ÷ market cap, last 90 days", k => fmt(C[k].trend.last90.avgTurnoverPct, 1) + "%"],
+  ].map(([l, f]) => `<tr><td>${l}</td>${K.map(k => `<td>${f(k)}</td>`).join("")}</tr>`).join("") + `</tbody>`;
+
+const lbl = C.spx.trend.series.map(r => r[0]);
+const xTime = { ticks: { maxTicksLimit: 5, maxRotation: 0, autoSkipPadding: 16, callback(v) { const l = this.getLabelForValue(v); return l ? l.slice(0, 7) : l; } }, grid: { display: false } };
+new Chart(cPx, { type: "line", data: { labels: lbl, datasets: K.map(k => { const s = C[k].trend.series; const b = s[0][1]; return { label: nm(k), data: s.map(r => 100 * r[1] / b), borderColor: col(k), borderWidth: 2 }; }) },
+  options: { scales: { x: xTime, y: { type: "logarithmic", ticks: { callback: v => [10, 20, 50, 100, 200].includes(v) ? v : "" } } } } });
+const roll = (a, n) => a.map((_, i) => { const s = a.slice(Math.max(0, i - n + 1), i + 1); return s.reduce((x, y) => x + y, 0) / s.length; });
+new Chart(cTurn, { type: "line", data: { labels: lbl, datasets: K.map(k => { const s = C[k].trend.series; const circ = C[k].circ; return { label: nm(k), data: roll(s.map(r => 100 * r[2] / (r[1] * circ)), 30), borderColor: col(k), borderWidth: 2 }; }) },
+  options: { scales: { x: xTime, y: { type: "logarithmic", ticks: { callback: v => [1, 2, 5, 10, 20, 50, 100].includes(v) ? v + "%" : "" } } } } });
+document.getElementById("trendT").innerHTML = `<thead><tr><th></th>${K.map(k => `<th>${nm(k)}</th>`).join("")}</tr></thead><tbody>` +
+  [["Price, last 90 days", k => pc(C[k].trend.last90.priceChangePct)], ["Price, the 90 days before", k => pc(C[k].trend.prior90.priceChangePct)], ["Price, one year", k => pc(C[k].trend.yearChangePct)],
+   ["Average daily volume, last 90 days", k => usd(C[k].trend.last90.avgVolUsd)], ["… change on the 90 days before", k => pc(100 * (C[k].trend.last90.avgVolUsd / C[k].trend.prior90.avgVolUsd - 1))]]
+  .map(([l, f]) => `<tr><td>${l}</td>${K.map(k => `<td>${f(k)}</td>`).join("")}</tr>`).join("") + `</tbody>`;
+
+const link = (k, a) => { const [ch, ad] = a.includes(":") ? a.split(":") : [C[k].chains === "Base" ? "base" : "sol", a];
+  const u = ch === "eth" ? `https://etherscan.io/address/${ad}` : ch === "base" ? `https://basescan.org/address/${ad}` : `https://solscan.io/account/${ad}`;
+  return `<a href="${u}" target="_blank" rel="noopener">${ad.slice(0, 6)}…${ad.slice(-4)}</a>${ch === "eth" || ch === "sol" && k === "spx" ? ` <span style="color:var(--dim)">${ch}</span>` : ""}`; };
+document.getElementById("tops").innerHTML = K.map(k => `<div class="tbl"><table><thead><tr><th>${nm(k)}</th><th>Balance</th><th>% of supply</th></tr></thead><tbody>` +
+  C[k].top.slice(0, 6).map(([a, b]) => `<tr><td>${link(k, a)}</td><td>${usd(b * C[k].price)}</td><td>${fmt(100 * b / C[k].circ, 2)}%</td></tr>`).join("") + `</tbody></table></div>`).join("");
+</script>

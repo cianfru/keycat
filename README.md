@@ -36,3 +36,18 @@ market price. Coins leaving a pool to a wallet are buys, coins sent into a pool 
 the null address and the burn address are not holders. Exchange wallets are **not tagged yet**, so
 an exchange hot wallet among the top holders counts as a holder; check the top-holders table.
 "Holders" are addresses, not people.
+
+## Peer comparison: SPX6900, FARTCOIN, BOME, KEYCAT
+
+A current holder snapshot of all four on the same dollar scale (`report/memecoin-holders.html`):
+
+```sh
+python3 scripts/sol_snapshot.py bome ukHH6c7mMyiWCf1b9pnWe25TSpkDDt3H5pQZgZ74J82
+python3 scripts/sol_snapshot.py fartcoin 9BB6NFEcjBCtnNLFko2FqVQBq8HHM13kCyYcdQbgpump
+python3 scripts/sol_snapshot.py spxsol J3NKxxXZcnNiMjKw9hYb2K4LUxgwB6t1FtPtQVsv3KFr
+python3 scripts/sol_classify.py bome fartcoin spxsol   # hot-wallet test for the 40 largest owners
+python3 scripts/peers.py                                # needs data/spx/transfers.csv + data/transfers.csv
+node scripts/build-peers.mjs
+```
+
+A snapshot shows who holds today, not who bought or sold; Solana has no free full transfer history.
