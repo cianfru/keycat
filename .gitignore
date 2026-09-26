@@ -8,3 +8,4 @@ data/spx/transfers.csv
 data/spx/archive.csv.gz
 data/sol/*.json
 !data/sol/activity.json
+__pycache__/
